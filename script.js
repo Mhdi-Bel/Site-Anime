@@ -24,8 +24,8 @@ async function loadPopularAnime() {
 
         container.innerHTML = ''; // Vider le texte de chargement
 
-        // Dupliquer les données pour créer l'effet de boucle infinie (9 + 9 = 18 cartes)
-        const infiniteAnimes = [...animes, ...animes];
+        // Dupliquer les données pour créer l'effet de boucle infinie sur tous les écrans (4 sets pour couvrir les grands écrans)
+        const infiniteAnimes = [...animes, ...animes, ...animes, ...animes];
 
         infiniteAnimes.forEach((anime) => {
             const card = document.createElement('a');
@@ -166,7 +166,8 @@ async function loadPopularManga() {
 
         container.innerHTML = '';
 
-        const infiniteMangas = [...mangas, ...mangas];
+        // Duplication pour couvrir de très grandes largeurs d'écran
+        const infiniteMangas = [...mangas, ...mangas, ...mangas, ...mangas];
 
         infiniteMangas.forEach((manga) => {
             const card = document.createElement('a');
