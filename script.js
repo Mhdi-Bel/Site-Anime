@@ -1,6 +1,21 @@
 
 const menu = document.getElementById('menu');
 
+// Fonction utilitaire pour éviter les failles XSS
+function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    if (typeof str !== 'string') return String(str);
+    return str.replace(/[&<>'"]/g, 
+        tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag] || tag)
+    );
+}
+
 function closeNavbar() {
     menu.classList.remove('max-md:left-0');
     menu.classList.add('max-md:-left-full');
@@ -646,9 +661,9 @@ async function loadDetails() {
 }
 
 function renderDetailView(container, item, type) {
-    const title = escapeHTML(item.title_english || item.title);
+    const title = escapeHTML(item.title_english || item.title || 'Unknown Title');
     const originalTitle = escapeHTML(item.title_japanese || '');
-    const imageUrl = item.images.webp.large_image_url;
+    const imageUrl = item.images?.webp?.large_image_url || '';
     
     const safeSynopsis = escapeHTML(item.synopsis || 'No synopsis available.');
     const synopsis = safeSynopsis.replace(/\n/g, '<br>');
@@ -657,8 +672,8 @@ function renderDetailView(container, item, type) {
     const rank = item.rank ? `#${item.rank}` : 'N/A';
     const popularity = item.popularity ? `#${item.popularity}` : 'N/A';
     
-    const genres = item.genres.map(g => `<a href="#" class="px-3 py-1 bg-white/10 border border-white/20 rounded-full text-sm text-gray-300 hover:bg-white/20 hover:text-white transition-colors">${escapeHTML(g.name)}</a>`).join('');
-    const themes = item.themes.map(t => `<a href="#" class="px-3 py-1 bg-white/10 border border-white/20 rounded-full text-sm text-gray-300 hover:bg-white/20 hover:text-white transition-colors">${escapeHTML(t.name)}</a>`).join('');
+    const genres = (item.genres || []).map(g => `<a href="#" class="px-3 py-1 bg-white/10 border border-white/20 rounded-full text-sm text-gray-300 hover:bg-white/20 hover:text-white transition-colors">${escapeHTML(g.name)}</a>`).join('');
+    const themes = (item.themes || []).map(t => `<a href="#" class="px-3 py-1 bg-white/10 border border-white/20 rounded-full text-sm text-gray-300 hover:bg-white/20 hover:text-white transition-colors">${escapeHTML(t.name)}</a>`).join('');
     
     let typeSpecificInfo;
     if (type === 'anime') {
@@ -667,7 +682,7 @@ function renderDetailView(container, item, type) {
             <li class="flex justify-between py-2 border-b border-white/10"><span>Episodes:</span> <span class="font-semibold">${item.episodes || 'N/A'}</span></li>
             <li class="flex justify-between py-2 border-b border-white/10"><span>Status:</span> <span class="font-semibold">${item.status || 'N/A'}</span></li>
             <li class="flex justify-between py-2 border-b border-white/10"><span>Aired:</span> <span class="font-semibold text-right">${item.aired?.string || 'N/A'}</span></li>
-            <li class="flex justify-between py-2"><span>Studio:</span> <span class="font-semibold">${item.studios[0]?.name || 'N/A'}</span></li>
+            <li class="flex justify-between py-2"><span>Studio:</span> <span class="font-semibold">${item.studios?.[0]?.name || 'N/A'}</span></li>
         `;
     } else { // manga
         typeSpecificInfo = `
